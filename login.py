@@ -6,20 +6,21 @@ class AdminWindow:
     #TODO make a new window or configure the current one?
     def __init__(self, master):
         self.master = master
-        master.title("Admin")
+        master.title("Admin control panel")
 
 
 class RecruiterWindow:
+    # Tables: etaireia (link=AFM) recruiter
     def __init__(self, master):
         self.master = master
-        master.title("Recruiter")
+        master.title("Recruiter control panel")
 
 
 
 class CandidateWindow:
     def __init__(self, master):
         self.master = master
-        master.title("Candidate")
+        master.title("Candidate control panel")
 
 
 def test():
@@ -81,21 +82,23 @@ class LoginWindow:
             logged in. If the password if wrong it makes a new label and tells the user
         """
         self.type_of_user = mysqlFunctions.login(self.input_username.get(), self.input_password.get())
+        #TODO make windows independant of the login page
         if self.type_of_user == 'recruiter':
             root2 = Toplevel(self.master)
             recruiter = RecruiterWindow(root2)
 
+
         elif self.type_of_user == 'candidate':
-            pass
-            # candidate_window()
+            root2 = Toplevel(self.master)
+            candidate = CandidateWindow(root2)
         elif self.type_of_user == 'admin':
-            pass
-            # admin_window()
+            root2 = Toplevel(self.master)
+            admin = AdminWindow(root2)
         else:
             self.wrong_password = Label(self.master, text='Wrong password or username', fg='red')
             self.wrong_password.grid(row=1, column=1, columnspan=3, sticky=N)
 
-    print(mysqlFunctions.login('msmith', 'we3wd'))
+
 
 
 root = Tk()
