@@ -9,6 +9,8 @@ class AdminWindow:
         self.master = master
         master.title("Admin control panel")
         master.geometry("500x500")
+        self.create_widgets()
+        self.grid_widgets()
 
     def create_widgets(self):
         self.register_account_button = Button(self.master, text='register new account')

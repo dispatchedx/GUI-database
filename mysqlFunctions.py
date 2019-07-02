@@ -25,8 +25,8 @@ def login(username, password):
      If user doesnt exist returns "None"
     """
     cursor = my_database.cursor()
-    cursor.execute("""SELECT username, password FROM user
-     WHERE username = %s AND password = %s""", (username, password,))
+    cursor.execute("""SELECT username, password FROM user 
+    WHERE username = %s AND password = %s""", (username, password,))
     result = cursor.fetchone()
 
     try:
@@ -39,5 +39,16 @@ def login(username, password):
                 return 'admin'
         else:
             return None
+    finally:
+        cursor.close()
+
+def register(info_list):
+
+    cursor = my_database.cursor()
+    try:
+        cursor.execute("""INSERT INTO `user` (username, `password`, `name`, surname, reg_date, email) values (%s, %s, %s, 
+        %s, '1337-08-25 04:20:00', %s);""", (info_list[0], info_list[1], info_list[2], info_list[3], info_list[4],))
+        cursor.execute("""INSERT INTO recruiter (username, exp_years, firm) values (%s, %b, %s);""",
+                       (info_list[0], info_list[5], info_list[6],))
     finally:
         cursor.close()
