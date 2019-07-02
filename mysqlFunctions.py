@@ -52,3 +52,17 @@ def register(info_list):
                        (info_list[0], info_list[5], info_list[6],))
     finally:
         cursor.close()
+
+
+cursor = my_database.cursor()
+# TODO IT DOESNT INSTERT XD okay fixed needed to commit
+try:
+
+    cursor.execute('INSERT into user VALUES (%s,%s,%s,%s,%s,%s)',('username','password','name','surname',
+                                                                  '1337-08-25 04:20:00', 'email'))
+
+    my_database.commit()
+    result = cursor.fetchone()
+    print(result)
+finally:
+    cursor.close()
