@@ -46,23 +46,26 @@ def register(info_list):
 
     cursor = my_database.cursor()
     try:
-        cursor.execute("""INSERT INTO `user` (username, `password`, `name`, surname, reg_date, email) values (%s, %s, %s, 
-        %s, '1337-08-25 04:20:00', %s);""", (info_list[0], info_list[1], info_list[2], info_list[3], info_list[4],))
+        cursor.execute("""INSERT INTO user VALUES (%s, %s, %s, %s, %s, %s);""",
+                       (info_list[0], info_list[1], info_list[2], info_list[3], info_list[4], info_list[5]))
+        my_database.commit()
         cursor.execute("""INSERT INTO recruiter (username, exp_years, firm) values (%s, %b, %s);""",
-                       (info_list[0], info_list[5], info_list[6],))
+                       (info_list[0], info_list[6], info_list[7],))
+        my_database.commit()
+        return 'Success'
     finally:
         cursor.close()
 
-
+'''
 cursor = my_database.cursor()
 # TODO IT DOESNT INSTERT XD okay fixed needed to commit
 try:
 
-    cursor.execute('INSERT into user VALUES (%s,%s,%s,%s,%s,%s)',('username','password','name','surname',
+    cursor.execute('INSERT into user VALUES (%s,%s,%s,%s,%s,%s)', ('username', 'password', 'name', 'surname',
                                                                   '1337-08-25 04:20:00', 'email'))
 
     my_database.commit()
     result = cursor.fetchone()
     print(result)
 finally:
-    cursor.close()
+    cursor.close()'''

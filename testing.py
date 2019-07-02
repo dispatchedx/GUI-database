@@ -1,5 +1,7 @@
 from tkinter import *
 import mysqlFunctions
+import datetime
+
 
 class AdminWindow:
     # TODO make a new window or configure the current one?
@@ -59,10 +61,14 @@ class AdminWindow:
         self.email_entry.grid(row=6, column=6, pady=10, sticky=W)
 
     def submit(self):
+        # TODO maybe reg_date is automatic
         self.info_list = []
         for var in self.variables:
             self.info_list.append(var.get())
+        self.current_datetime = datetime.datetime.now()
+        self.info_list.insert(4, self.current_datetime.strftime("%Y-%m-%d %H:%M:%S"))
         mysqlFunctions.register(self.info_list)
+
     def register_candidate(self):
         self.register_base()
         self.exp_years = Label(self.master, text='Years of experience')
@@ -70,6 +76,7 @@ class AdminWindow:
         self.input_exp_years = IntVar()
         self.exp_years_entry = Entry(self.master, textvariable=self.input_exp_years)
         self.input_firm = StringVar()
+        # TODO make firm a listbox
         self.firm_entry = Entry(self.master, textvariable=self.input_firm)
 
         self.exp_years.grid(row=7, column=5, padx=10, sticky=E)
@@ -91,7 +98,6 @@ class AdminWindow:
 
     def register_recruiter(self):
         self.register_base()
-
         self.variables = [self.input_username,
                           self.input_password,
                           self.input_name,
