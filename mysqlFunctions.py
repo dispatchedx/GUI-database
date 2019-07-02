@@ -43,6 +43,30 @@ def login(username, password):
         cursor.close()
 
 
+def fetch_belongs():
+    cursor = my_database.cursor()
+    cursor.execute('SELECT distinct belongs_to FROM antikeim WHERE belongs_to IS NOT NULL;')
+    result = cursor.fetchall()
+    values_list = []
+    # Convert tuple to list
+    for val in result:
+        values_list.append(''.join(val))
+    cursor.close()
+    return values_list
+
+
+def fetch_tables():
+    cursor = my_database.cursor()
+    cursor.execute('SHOW TABLES;')
+    result = cursor.fetchall()
+    # Convert tuple to list
+    tables_list = []
+    for var in result:
+        tables_list.append(''.join(var))
+    cursor.close()
+    return tables_list
+
+
 def register(info_list, table_name):
 
     for entry in info_list:
@@ -50,18 +74,23 @@ def register(info_list, table_name):
         if len(str(entry)) < 1:
             return 'Error: all fields are required'
     cursor = my_database.cursor()
+
     try:
-        cursor.execute("""INSERT INTO user VALUES (%s, %s, %s, %s, %s, %s)""",
-                       (info_list[0], info_list[1], info_list[2], info_list[3], info_list[4], info_list[5]))
-        my_database.commit()
+        if table_name == 'recruiter' or table_name == 'candidate':
+            cursor.execute("""INSERT INTO user VALUES (%s, %s, %s, %s, %s, %s)""",
+                           (info_list[0], info_list[1], info_list[2], info_list[3], info_list[4], info_list[5]))
+            my_database.commit()
         if table_name == 'recruiter':
             cursor.execute("""INSERT INTO recruiter (username, exp_years, firm) values (%s, %b, %s)""",
                            (info_list[0], info_list[6], info_list[7],))
         elif table_name == 'candidate':
             cursor.execute("""INSERT INTO candidate (username, bio, sistatikes, certificates) values
              (%s, %s, %s, %s)""", (info_list[0], info_list[6], info_list[7], info_list[8],))
+        elif table_name == 'antikeim':
+            cursor.execute('INSERT INTO antikeim (Title, descr, belongs_to) VALUES (%s, %s, %s) ',
+                           (info_list[0], info_list[1] + ', child of %s' % info_list[2], info_list[2]))
         else:
-            return 'Error: no table name %s exits' % table_name
+            return f'Error: no table name {table_name} exits'
         my_database.commit()
         return 'Success'
     except MySQLdb.Error as e:
@@ -69,16 +98,4 @@ def register(info_list, table_name):
     finally:
         cursor.close()
 
-'''
-cursor = my_database.cursor()
-# TODO IT DOESNT INSTERT XD okay fixed needed to commit
-try:
 
-    cursor.execute('INSERT into user VALUES (%s,%s,%s,%s,%s,%s)', ('username', 'password', 'name', 'surname',
-                                                                  '1337-08-25 04:20:00', 'email'))
-
-    my_database.commit()
-    result = cursor.fetchone()
-    print(result)
-finally:
-    cursor.close()'''

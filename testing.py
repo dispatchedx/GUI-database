@@ -2,6 +2,7 @@ from tkinter import *
 import mysqlFunctions
 import datetime
 from tkinter import messagebox
+from tkinter import ttk
 
 
 class AdminWindow:
@@ -15,16 +16,78 @@ class AdminWindow:
 
     def create_widgets(self):
         self.upper_left_space = Label(self.master)
-        self.register_candidate_button = Button(self.master, text='register a candidate',
+        self.register_candidate_button = Button(self.master, text='Register a candidate',
                                                 command=self.register_candidate)
-        self.register_recruiter_button = Button(self.master, text='register a recruiter',
+        self.register_recruiter_button = Button(self.master, text='Register a recruiter',
                                                 command=self.register_recruiter)
-
+        self.add_antikeim_button = Button(self.master, text='Add antikeim',
+                                          command=self.add_antikeim)
+        self.add_business_areas_button = Button(self.master, text='Add business areas',
+                                                command=self.add_business_areas)
+        self.change_history_button = Button(self.master, text='Change history', command=self.change_history)
 
     def grid_widgets(self):
         self.upper_left_space.grid(padx=10, pady=0)
-        self.register_candidate_button.grid(row=2, column=3, sticky=NSEW, ipadx=20, pady=5)
-        self.register_recruiter_button.grid(row=4, column=3, sticky=NSEW, pady=5)
+        self.register_candidate_button.grid(row=2, column=3, sticky=NSEW, ipady=2, ipadx=20, pady=5)
+        self.register_recruiter_button.grid(row=3, column=3, sticky=NSEW, ipady=2)
+        self.add_antikeim_button.grid(row=4, column=3, sticky=NSEW, ipady=2, pady=5)
+        self.add_business_areas_button.grid(row=5, column=3, sticky=NSEW, ipady=2)
+        self.change_history_button.grid(row=6, column=3, sticky=NSEW, ipady=2, pady=5)
+
+    def add_antikeim(self):
+        self.destroyer()
+        # Variables
+        self.input_title = StringVar()
+
+        # Labels
+        self.title = Label(self.master, text='    Title')
+        self.description = Label(self.master, text='Description')
+        self.belongs = Label(self.master, text='Belongs to')
+
+        # Entries and List boxes
+        self.title_entry = Entry(self.master, textvariable=self.input_title)
+        self.description_combobox = ttk.Combobox(self.master, state="readonly", values=['Level one element',
+                                                                                        'Level two element'])
+        self.values_belongs = mysqlFunctions.fetch_belongs()
+        belongs_list = []
+        # Adding values by iterating belongs_list
+        self.belongs_combobox = ttk.Combobox(self.master, state="readonly", values=[value for value in belongs_list])
+        # Grid
+        self.title.grid(row=2, column=5, padx=10, sticky=E)
+        self.title_entry.grid(row=2, column=6, ipady=1, sticky=E+W)
+        self.description.grid(row=3, column=5, sticky=E)
+        self.description_combobox.grid(row=3, column=6)
+        self.belongs.grid(row=4, column=5, sticky=E)
+        self.belongs_combobox.grid(row=4, column=6)
+        self.submit_button = Button(self.master, text='Submit',
+                                    command=lambda: self.submit('antikeim', self.title_entry.get()))
+        self.submit_button.grid(row=5, column=6, sticky=NSEW)
+
+        self.variables = [self.title_entry,
+                          self.description_combobox,
+                          self.belongs_combobox]
+
+        self.removable_widgets = [self.submit_button,
+                                  self.title,
+                                  self.title_entry,
+                                  self.description,
+                                  self.belongs,
+                                  self.belongs_combobox,
+                                  self.description_combobox]
+
+    def add_business_areas(self):
+        self.destroyer()
+
+    def change_history(self):
+        self.destroyer()
+        self.change_h_for_table = Label(self.master, text='Show history for table')
+        self.tables_list = mysqlFunctions.fetch_tables()
+        self.change_h_for_table_combobox = ttk.Combobox(self.master, state='readonly',
+                                                        values=[table_name for table_name in self.tables_list])
+
+        self.change_h_for_table.grid(row=2, column=5)
+        #self.tables_list.grid(self.master, row=3, column=5)
+        self.change_h_for_table_combobox.grid(row=2, column=6)
 
     def register_base(self):
         # TODO registration date no need for this it should be automatic
@@ -68,24 +131,33 @@ class AdminWindow:
         self.removable_widgets = [self.username, self.username_entry, self.password, self.password_entry, self.name,
                                   self.name_entry, self.surname, self.surname_entry, self.email, self.email_entry]
 
-    def submit(self, table_name):
+    def submit(self, table_name, primary_key):
         # TODO maybe reg_date is automatic
-        self.table_name = table_name
+        #self.table_name = table_name
         self.info_list = []
         for var in self.variables:
             self.info_list.append(var.get())
         self.current_datetime = datetime.datetime.now()
-        self.info_list.insert(4, self.current_datetime.strftime("%Y-%m-%d %H:%M:%S"))
-
-        result = mysqlFunctions.register(self.info_list, self.table_name)
+        if table_name == 'recruiter' or table_name == 'candidate':
+            self.info_list.insert(4, self.current_datetime.strftime("%Y-%m-%d %H:%M:%S"))
+            result = mysqlFunctions.register(self.info_list, table_name)
+        elif table_name == 'antikeim':
+            result = mysqlFunctions.register(self.info_list, table_name)
+        else:
+            result = 'Error: no table %s exists' % table_name
         if result == 'Success':
             self.destroyer()
-            messagebox.showinfo("Success", f'Registration of {self.input_username.get()} was a success')
+            messagebox.showinfo("Success", f'Registration of {primary_key} was a success')
         else:
             messagebox.showerror("Error", result)
 
     def destroyer(self):
         # TODO proper way is to put everything in a frame and delete the frame
+        """
+        Destroys every widget except the starting buttons.
+        Calling this will essentially return you to the starting panel
+
+        """
         try:
             for self.widget in self.removable_widgets:
                 self.widget.destroy()
@@ -108,8 +180,9 @@ class AdminWindow:
         self.exp_years.grid(row=7, column=5, padx=10, sticky=E)
         self.exp_years_entry.grid(row=7, column=6, sticky=W)
 
-        self.submit_button = Button(self.master, text='register', command=lambda: self.submit('recruiter'))
-        self.submit_button.grid(row=9, column=6)
+        self.submit_button = Button(self.master, text='register',
+                                    command=lambda: self.submit('recruiter', self.input_username.get()))
+        self.submit_button.grid(row=9, column=6, sticky=NSEW)
 
         self.variables = [self.input_username,
                           self.input_password,
@@ -155,8 +228,9 @@ class AdminWindow:
         self.sistatikes_entry.grid(row=8, column=6, pady=10, sticky=W)
         self.bio_entry.grid(row=9, column=6, sticky=W+E)
 
-        self.submit_button = Button(self.master, text='register', command=lambda: self.submit('candidate'))
-        self.submit_button.grid(row=10, pady=5, column=6)
+        self.submit_button = Button(self.master, text='register',
+                                    command=lambda: self.submit('candidate',self.input_username.get()))
+        self.submit_button.grid(row=10, pady=5, column=6, sticky=NSEW)
 
         self.variables = [self.input_username,
                           self.input_password,
