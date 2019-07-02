@@ -81,14 +81,19 @@ class AdminWindow:
     def change_history(self):
         self.destroyer()
         self.change_h_for_table = Label(self.master, text='Show history for table')
-        self.tables_list = mysqlFunctions.fetch_tables()
-        self.change_h_for_table_combobox = ttk.Combobox(self.master, state='readonly',
-                                                        values=[table_name for table_name in self.tables_list])
-
         self.change_h_for_table.grid(row=2, column=5)
-        #self.tables_list.grid(self.master, row=3, column=5)
+        self.change_h_for_table_combobox = ttk.Combobox(self.master, state='readonly',
+                                                        values=['candidate',
+                                                                'recruiter',
+                                                                'user',
+                                                                'etaireia',
+                                                                'job'])
         self.change_h_for_table_combobox.grid(row=2, column=6)
-
+        self.change_h_for_user = Label(self.master, text='Show history for user')
+        self.change_h_for_user.grid(row=3, column=5)
+        users = mysqlFunctions.fetch_users()
+        self.change_h_for_user_combobox = ttk.Combobox(self.master, state='readonly', values=[user for user in users])
+        self.change_h_for_user_combobox.grid(row=3, column=6)
     def register_base(self):
         # TODO registration date no need for this it should be automatic
         # TODO username=12 length, password=10, name=25, surname=35, email=30, firm/AFM=9, exp_years=TINYINT,

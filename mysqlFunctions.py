@@ -55,6 +55,18 @@ def fetch_belongs():
     return values_list
 
 
+def fetch_users():
+    cursor = my_database.cursor()
+    cursor.execute('SELECT username from user')
+    result = cursor.fetchall()
+    # Convert tuple to list
+    users_list = []
+    for var in result:
+        users_list.append(''.join(var))
+    cursor.close()
+    return users_list
+
+''' # Useless function
 def fetch_tables():
     cursor = my_database.cursor()
     cursor.execute('SHOW TABLES;')
@@ -65,7 +77,7 @@ def fetch_tables():
         tables_list.append(''.join(var))
     cursor.close()
     return tables_list
-
+'''
 
 def register(info_list, table_name):
 
