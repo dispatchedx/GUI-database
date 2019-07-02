@@ -45,6 +45,7 @@ class CandidateWindow:
 
     def grid_widgets(self):
         pass
+
 def test():
     print('works')
 
@@ -112,6 +113,8 @@ class LoginWindow:
         elif self.type_of_user == 'admin':
             root2 = Toplevel(self.master)
             admin = AdminWindow(root2)
+            # TODO when new window closes, program closes
+            root.withdraw()
         else:
             self.wrong_password = Label(self.master, text='Wrong password or username', fg='red')
             self.wrong_password.grid(row=1, column=1, columnspan=3, sticky=N)

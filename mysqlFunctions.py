@@ -42,17 +42,30 @@ def login(username, password):
     finally:
         cursor.close()
 
-def register(info_list):
 
+def register(info_list, table_name):
+
+    for entry in info_list:
+        # TODO if bad afm is given error pops up but its still registered as user
+        if len(str(entry)) < 1:
+            return 'Error: all fields are required'
     cursor = my_database.cursor()
     try:
-        cursor.execute("""INSERT INTO user VALUES (%s, %s, %s, %s, %s, %s);""",
+        cursor.execute("""INSERT INTO user VALUES (%s, %s, %s, %s, %s, %s)""",
                        (info_list[0], info_list[1], info_list[2], info_list[3], info_list[4], info_list[5]))
         my_database.commit()
-        cursor.execute("""INSERT INTO recruiter (username, exp_years, firm) values (%s, %b, %s);""",
-                       (info_list[0], info_list[6], info_list[7],))
+        if table_name == 'recruiter':
+            cursor.execute("""INSERT INTO recruiter (username, exp_years, firm) values (%s, %b, %s)""",
+                           (info_list[0], info_list[6], info_list[7],))
+        elif table_name == 'candidate':
+            cursor.execute("""INSERT INTO candidate (username, bio, sistatikes, certificates) values
+             (%s, %s, %s, %s)""", (info_list[0], info_list[6], info_list[7], info_list[8],))
+        else:
+            return 'Error: no table name %s exits' % table_name
         my_database.commit()
         return 'Success'
+    except MySQLdb.Error as e:
+        return 'MySQL Error [%d]: %s' % (e.args[0], e.args[1])
     finally:
         cursor.close()
 
