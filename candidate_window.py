@@ -37,7 +37,6 @@ class CandidateWindow(admin_window.AdminWindow):
         self.edit_button.grid(row=10, column=6, sticky=NSEW)
         self.username_entry.insert(END, self.stored_username)
         self.username_entry.config(state='disabled')
-        # TODO check if stored_username works
         self.info_list = mysqlFunctions.fetch_candidate_info(self.stored_username)
         entry_widgets = [widget for widget in self.removable_widgets if 'entry' in str(widget)]
         # Fill each entry with corresponding info
