@@ -232,7 +232,7 @@ class AdminWindow(mysqlFunctions.Common):
         self.bio_entry.grid(row=9, column=6, sticky=W+E)
 
         self.submit_button = Button(self.master, text='register',
-                                    command=lambda: self.submit('candidate',self.input_username.get()))
+                                    command=lambda: self.submit('candidate', self.input_username.get()))
         self.submit_button.grid(row=10, pady=5, column=6, sticky=NSEW)
 
         self.variables = [self.input_username,
@@ -241,13 +241,13 @@ class AdminWindow(mysqlFunctions.Common):
                           self.input_surname,
                           self.input_email,
                           self.input_bio,
-                          self.input_sistatikes,
-                          self.input_certificates
+                          self.input_certificates,
+                          self.input_sistatikes
                           ]
-        self.removable_widgets.extend([self.sistatikes,
-                                       self.sistatikes_entry,
-                                       self.certificates,
+        self.removable_widgets.extend([self.certificates,
                                        self.certificates_entry,
+                                       self.sistatikes,
+                                       self.sistatikes_entry,
                                        self.bio,
                                        self.bio_entry,
                                        self.submit_button

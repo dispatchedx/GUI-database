@@ -34,6 +34,29 @@ class Common(object):
             pass
 
 
+def edit_info(username, info_list_updated):
+    """
+
+    :param username: Username
+    :var: info_list_updated: List of strings: contains the updated info in order: [password, name, surname, email,
+    certificates, sistatikes, bio]
+    :return:
+    """
+    cursor = my_database.cursor()
+    try:
+        cursor.execute("""UPDATE  user SET password= %s, name=%s, surname=%s, email=%s WHERE user.username=%s""",
+                       (info_list_updated[0], info_list_updated[1], info_list_updated[2], info_list_updated[3],
+                        username))
+        cursor.execute("""UPDATE candidate SET  certificates=%s, sistatikes=%s, bio=%s WHERE candidate.username=%s""",
+                       (info_list_updated[4], info_list_updated[5], info_list_updated[6], username))
+        my_database.commit()
+        print('Success')
+    except MySQLdb.Error as e:
+        my_database.rollback()
+        return 'MySQL Error [%d]: %s' % (e.args[0], e.args[1])
+    finally:
+        cursor.close()
+
 def login(username, password):
     """
 
@@ -103,6 +126,7 @@ def fetch_candidate_info(candidate_username):
     cursor.execute("""SELECT password,name,surname,email,certificates,sistatikes,bio FROM candidate 
     INNER JOIN user ON user.username=candidate.username WHERE user.username=%s""", [candidate_username])
     result = cursor.fetchone()
+    # Convert tuple to list
     info_list = []
     for var in result:
         info_list.append(''.join(var))
@@ -127,7 +151,6 @@ def fetch_tables():
 def register(info_list, table_name):
 
     for entry in info_list:
-        # TODO if bad afm is given error pops up but its still registered as user
         if len(str(entry)) < 1:
             return 'Error: all fields are required'
     cursor = my_database.cursor()
@@ -136,7 +159,6 @@ def register(info_list, table_name):
         if table_name == 'recruiter' or table_name == 'candidate':
             cursor.execute("""INSERT INTO user VALUES (%s, %s, %s, %s, %s, %s)""",
                            (info_list[0], info_list[1], info_list[2], info_list[3], info_list[4], info_list[5]))
-            my_database.commit()
         if table_name == 'recruiter':
             cursor.execute("""INSERT INTO recruiter (username, exp_years, firm) values (%s, %b, %s)""",
                            (info_list[0], info_list[6], info_list[7],))
@@ -151,6 +173,7 @@ def register(info_list, table_name):
         my_database.commit()
         return 'Success'
     except MySQLdb.Error as e:
+        my_database.rollback()
         return 'MySQL Error [%d]: %s' % (e.args[0], e.args[1])
     finally:
         cursor.close()

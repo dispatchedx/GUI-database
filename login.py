@@ -76,7 +76,6 @@ class LoginWindow:
             logged in. If the password if wrong it makes a new label and tells the user
         """
 
-
         self.type_of_user = mysqlFunctions.login(self.input_username.get(), self.input_password.get())
         # TODO make windows independent of the login page
         if self.type_of_user == 'recruiter':
