@@ -36,9 +36,8 @@ class Common(object):
 
 def edit_info(username, info_list_updated):
     """
-
     :param username: Username
-    :var: info_list_updated: List of strings: contains the updated info in order: [password, name, surname, email,
+    :param: info_list_updated: List of strings: contains the updated info in order: [password, name, surname, email,
     certificates, sistatikes, bio]
     :return:
     """
@@ -50,16 +49,16 @@ def edit_info(username, info_list_updated):
         cursor.execute("""UPDATE candidate SET  certificates=%s, sistatikes=%s, bio=%s WHERE candidate.username=%s""",
                        (info_list_updated[4], info_list_updated[5], info_list_updated[6], username))
         my_database.commit()
-        print('Success')
+        return'Success'
     except MySQLdb.Error as e:
         my_database.rollback()
         return 'MySQL Error [%d]: %s' % (e.args[0], e.args[1])
     finally:
         cursor.close()
 
+
 def login(username, password):
     """
-
     :param username: input username
     :param password: input password
     :return: Α String containing the type of user. Can be either "candidate", "recruiter", "admin".
@@ -133,7 +132,6 @@ def fetch_candidate_info(candidate_username):
     cursor.close()
     return info_list
 
-fetch_candidate_info('cleogeo')
 
 ''' # Useless function
 def fetch_tables():
@@ -147,6 +145,7 @@ def fetch_tables():
     cursor.close()
     return tables_list
 '''
+
 
 def register(info_list, table_name):
 

@@ -85,6 +85,7 @@ class LoginWindow:
         elif self.type_of_user == 'candidate':
             root2 = Toplevel(self.master)
             candidate = candidate_window.CandidateWindow(root2, self.input_username.get())
+            root.withdraw()
         elif self.type_of_user == 'admin':
             root2 = Toplevel(self.master)
             admin = admin_window.AdminWindow(root2)
@@ -93,6 +94,7 @@ class LoginWindow:
         else:
             self.wrong_password = Label(self.master, text='Wrong password or username', fg='red')
             self.wrong_password.grid(row=1, column=1, columnspan=3, sticky=N)
+
 
 if __name__ == '__main__':
     root = Tk()

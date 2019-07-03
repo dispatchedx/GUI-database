@@ -53,7 +53,12 @@ class CandidateWindow(admin_window.AdminWindow):
                 widget.config(state='readonly')
         self.edit_button.config(text='edit info', command=self.edit)
         self.info_list_updated = [entry.get() for entry in self.entry_widgets[1:]]
-        mysqlFunctions.edit_info(self.stored_username, self.info_list_updated)
+        # TODO if return success
+        result = mysqlFunctions.edit_info(self.stored_username, self.info_list_updated)
+        if result == 'Success':
+            messagebox.showinfo("Success", f'Successfully updated all values.')
+        else:
+            messagebox.showerror("Error", result)
 
     def edit(self):
         """
@@ -72,22 +77,7 @@ class CandidateWindow(admin_window.AdminWindow):
         self.destroyer()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 if __name__ == '__main__':
     root = Tk()
-    app = CandidateWindow(root)
+    app = CandidateWindow(root, None)
     root.mainloop()
