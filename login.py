@@ -1,9 +1,8 @@
 from tkinter import *
 import mysqlFunctions
 import admin_window
-
+import candidate_window
 # Admin credentials: Username=password=admin
-
 
 
 class RecruiterWindow:
@@ -20,18 +19,6 @@ class RecruiterWindow:
     def grid_widgets(self):
         pass
 
-
-class CandidateWindow:
-    def __init__(self, master):
-        self.master = master
-        master.title("Candidate control panel")
-
-
-    def create_widgets(self):
-        pass
-
-    def grid_widgets(self):
-        pass
 
 def test():
     print('works')
@@ -88,6 +75,8 @@ class LoginWindow:
         """ Calls mysqlFunctions.login and opens the appropriate window depending on the type of user that
             logged in. If the password if wrong it makes a new label and tells the user
         """
+
+
         self.type_of_user = mysqlFunctions.login(self.input_username.get(), self.input_password.get())
         # TODO make windows independent of the login page
         if self.type_of_user == 'recruiter':
@@ -96,7 +85,7 @@ class LoginWindow:
 
         elif self.type_of_user == 'candidate':
             root2 = Toplevel(self.master)
-            candidate = CandidateWindow(root2)
+            candidate = candidate_window.CandidateWindow(root2, self.input_username.get())
         elif self.type_of_user == 'admin':
             root2 = Toplevel(self.master)
             admin = admin_window.AdminWindow(root2)
@@ -106,7 +95,7 @@ class LoginWindow:
             self.wrong_password = Label(self.master, text='Wrong password or username', fg='red')
             self.wrong_password.grid(row=1, column=1, columnspan=3, sticky=N)
 
-
-root = Tk()
-app = LoginWindow(root)
-root.mainloop()
+if __name__ == '__main__':
+    root = Tk()
+    app = LoginWindow(root)
+    root.mainloop()

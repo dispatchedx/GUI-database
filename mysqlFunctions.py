@@ -16,6 +16,24 @@ my_database = MySQLdb.connect(
 )
 
 
+class Common(object):
+    def __init__(self):
+        self.removable_widgets = []
+
+    def destroyer(self):
+        # TODO proper way is to put everything in a frame and delete the frame
+        """
+        Destroys every widget except the starting buttons.
+        Calling this will essentially return you to the starting panel
+
+        """
+        try:
+            for self.widget in self.removable_widgets:
+                self.widget.destroy()
+        except AttributeError:
+            pass
+
+
 def login(username, password):
     """
 
@@ -44,6 +62,10 @@ def login(username, password):
 
 
 def fetch_belongs():
+    """
+
+    :return: List of strings: all unique belongs_to in table antikeim
+    """
     cursor = my_database.cursor()
     cursor.execute('SELECT distinct belongs_to FROM antikeim WHERE belongs_to IS NOT NULL;')
     result = cursor.fetchall()
@@ -56,6 +78,10 @@ def fetch_belongs():
 
 
 def fetch_users():
+    """
+
+    :return: List of strings: all usernames in the database
+    """
     cursor = my_database.cursor()
     cursor.execute('SELECT username from user')
     result = cursor.fetchall()
@@ -65,6 +91,25 @@ def fetch_users():
         users_list.append(''.join(var))
     cursor.close()
     return users_list
+
+
+def fetch_candidate_info(candidate_username):
+    """
+
+    :param candidate_username: String: Candidate's username to fetch info for
+    :return: List of Strings: password, name, surname, email, certificates, sistatikes, biography for given candidate
+    """
+    cursor = my_database.cursor()
+    cursor.execute("""SELECT password,name,surname,email,certificates,sistatikes,bio FROM candidate 
+    INNER JOIN user ON user.username=candidate.username WHERE user.username=%s""", [candidate_username])
+    result = cursor.fetchone()
+    info_list = []
+    for var in result:
+        info_list.append(''.join(var))
+    cursor.close()
+    return info_list
+
+fetch_candidate_info('cleogeo')
 
 ''' # Useless function
 def fetch_tables():

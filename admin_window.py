@@ -5,9 +5,10 @@ from tkinter import messagebox
 from tkinter import ttk
 
 
-class AdminWindow:
+class AdminWindow(mysqlFunctions.Common):
     # TODO make a new window or configure the current one?
     def __init__(self, master):
+        mysqlFunctions.Common.__init__(self)
         self.master = master
         master.title("Admin control panel")
         master.geometry("500x500")
@@ -165,18 +166,6 @@ class AdminWindow:
         else:
             messagebox.showerror("Error", result)
 
-    def destroyer(self):
-        # TODO proper way is to put everything in a frame and delete the frame
-        """
-        Destroys every widget except the starting buttons.
-        Calling this will essentially return you to the starting panel
-
-        """
-        try:
-            for self.widget in self.removable_widgets:
-                self.widget.destroy()
-        except AttributeError:
-            pass
 
     def register_recruiter(self):
         self.destroyer()
@@ -184,11 +173,10 @@ class AdminWindow:
         self.register_base()
         self.input_firm = StringVar()
         self.input_exp_years = IntVar()
-        self.firm = Label(self.master, text='AFM')
         self.exp_years = Label(self.master, text='Years of experience')
-        self.firm_entry = Entry(self.master, textvariable=self.input_firm)
         self.exp_years_entry = Entry(self.master, textvariable=self.input_exp_years)
-
+        self.firm = Label(self.master, text='AFM')
+        self.firm_entry = Entry(self.master, textvariable=self.input_firm)
         self.firm.grid(row=8, column=5, padx=10, sticky=E)
         self.firm_entry.grid(row=8, column=6, pady=10, sticky=W)
         self.exp_years.grid(row=7, column=5, padx=10, sticky=E)
@@ -230,6 +218,7 @@ class AdminWindow:
         # Entry text boxes
         self.certificates_entry = Entry(self.master, textvariable=self.input_certificates)
         self.sistatikes_entry = Entry(self.master, textvariable=self.input_sistatikes)
+        # TODO make this TEXT instead of Entry
         self.bio_entry = Entry(self.master, textvariable=self.input_bio)
 
         # Grid Labels
