@@ -35,6 +35,7 @@ class AdminWindow:
         self.change_history_button.grid(row=6, column=3, sticky=NSEW, ipady=2, pady=5)
 
     def add_antikeim(self):
+
         self.destroyer()
         # Variables
         self.input_title = StringVar()
@@ -55,9 +56,9 @@ class AdminWindow:
         # Grid
         self.title.grid(row=2, column=5, padx=10, sticky=E)
         self.title_entry.grid(row=2, column=6, ipady=1, sticky=E+W)
-        self.description.grid(row=3, column=5, sticky=E)
+        self.description.grid(row=3, column=5, padx=10, sticky=E)
         self.description_combobox.grid(row=3, column=6)
-        self.belongs.grid(row=4, column=5, sticky=E)
+        self.belongs.grid(row=4, column=5, padx=10, sticky=E)
         self.belongs_combobox.grid(row=4, column=6)
         self.submit_button = Button(self.master, text='Submit',
                                     command=lambda: self.submit('antikeim', self.title_entry.get()))
@@ -76,9 +77,11 @@ class AdminWindow:
                                   self.description_combobox]
 
     def add_business_areas(self):
+        # TODO implement this but need mysql part
         self.destroyer()
 
     def change_history(self):
+        # TODO implement this but need mysql part
         self.destroyer()
         self.change_h_for_table = Label(self.master, text='Show history for table')
         self.change_h_for_table.grid(row=2, column=5)
@@ -94,6 +97,12 @@ class AdminWindow:
         users = mysqlFunctions.fetch_users()
         self.change_h_for_user_combobox = ttk.Combobox(self.master, state='readonly', values=[user for user in users])
         self.change_h_for_user_combobox.grid(row=3, column=6)
+
+        self.removable_widgets = [self.change_h_for_user,
+                                  self.change_h_for_user_combobox,
+                                  self.change_h_for_table,
+                                  self.change_h_for_table_combobox]
+
     def register_base(self):
         # TODO registration date no need for this it should be automatic
         # TODO username=12 length, password=10, name=25, surname=35, email=30, firm/AFM=9, exp_years=TINYINT,
@@ -256,6 +265,7 @@ class AdminWindow:
                                        ])
 
 
-root = Tk()
-window = AdminWindow(root)
-root.mainloop()
+if __name__ == '__main__':
+    root = Tk()
+    app = AdminWindow(root)
+    root.mainloop()

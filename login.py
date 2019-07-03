@@ -1,22 +1,9 @@
 from tkinter import *
 import mysqlFunctions
-
+import admin_window
 
 # Admin credentials: Username=password=admin
-class AdminWindow:
-    # TODO make a new window or configure the current one?
-    def __init__(self, master):
-        self.master = master
-        master.title("Admin control panel")
-        master.geometry("500x500")
-        self.create_widgets()
-        self.grid_widgets()
 
-    def create_widgets(self):
-        self.register_account_button = Button(self.master, text='register new account')
-
-    def grid_widgets(self):
-        self.register_account_button.grid(row=0)
 
 
 class RecruiterWindow:
@@ -112,13 +99,12 @@ class LoginWindow:
             candidate = CandidateWindow(root2)
         elif self.type_of_user == 'admin':
             root2 = Toplevel(self.master)
-            admin = AdminWindow(root2)
+            admin = admin_window.AdminWindow(root2)
             # TODO when new window closes, program closes
             root.withdraw()
         else:
             self.wrong_password = Label(self.master, text='Wrong password or username', fg='red')
             self.wrong_password.grid(row=1, column=1, columnspan=3, sticky=N)
-
 
 
 root = Tk()
