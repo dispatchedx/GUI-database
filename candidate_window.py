@@ -8,12 +8,14 @@ import admin_window
 
 class CandidateWindow(admin_window.AdminWindow):
     def __init__(self, master, stored_username):
-        self.stored_username = stored_username
+        #TODO change liagourma to stored_username
+        self.stored_username = 'liagourma'#stored_username
         mysqlFunctions.Common.__init__(self)
         self.master = master
         master.title('Candidate control panel')
         master.geometry("500x500")
         self.create_widgets()
+
 
     def create_widgets(self):
         self.upper_left_space = Label(self.master)
@@ -30,6 +32,7 @@ class CandidateWindow(admin_window.AdminWindow):
 
     def view_profile(self):
         self.destroyer()
+        self.master.geometry("500x500")
         self.register_candidate()
         self.submit_button.destroy()
         self.edit_button = Button(self.master, text='edit info', command=self.edit)
@@ -39,7 +42,7 @@ class CandidateWindow(admin_window.AdminWindow):
         self.info_list = mysqlFunctions.fetch_candidate_info(self.stored_username)
         self.entry_widgets = [widget for widget in self.removable_widgets if 'entry' in str(widget)]
         self.removable_widgets.append(self.edit_button)
-        # Fill each entry with corresponding info
+        # Fill each entry with corresponding info and make it readonly
         for widget, info in zip(self.entry_widgets[1:], self.info_list):
                 widget.insert(END, info)
                 widget.config(state='readonly')
@@ -62,7 +65,7 @@ class CandidateWindow(admin_window.AdminWindow):
 
     def edit(self):
         """
-         entry_widget[0] is username and we don't want to change it so we put everything else
+         :var: entry_widget[0]: is username and we don't want to change it so we put everything else
          to normal state which means its editable
 
         """
@@ -72,10 +75,83 @@ class CandidateWindow(admin_window.AdminWindow):
 
     def available_jobs(self):
         self.destroyer()
+        self.master.geometry("1000x500")
+        tv = ttk.Treeview(self.master)
+        tv['columns'] = ('salary', 'position', 'edra', 'recruiter', 'announce_date', 'submission_date')
+        tv.heading("#0", text='Start date')
+        tv.column('#0', anchor='center', width=100)
+        tv.heading("salary", text='Salary')
+        tv.column('salary', anchor='center', width=50)
+        tv.heading("position", text='Position')
+        tv.column('position', anchor='center', width=200)
+        tv.heading("edra", text='Edra')
+        tv.column('edra', anchor='center', width=100)
+        tv.heading("recruiter", text='Recruiter')
+        tv.column('recruiter', anchor='center', width=70)
+        tv.heading("announce_date", text='Announce date')
+        tv.column('announce_date', anchor='center', width=115)
+        tv.heading("submission_date", text='Submission date')
+        tv.column('submission_date', anchor='center', width=100)
+        tv.grid(sticky=NSEW)
+
+        extra_space = Label(self.master)
+        extra_space.grid(row=12, column=5, pady=50, padx=5)
+
+        self.treeview= tv
+        self.treeview.grid(row=2, column=6, rowspan=12)
+
+        available_jobs = mysqlFunctions.fetch_available_jobs()
+
+        for job in available_jobs:
+            self.treeview.insert('', 'end', text=job[0], values=job[1:])
+        self.treeview.grid_rowconfigure(2, weight=0)
+
+        self.apply_job_button = Button(self.master, text='Apply to job(s)')
+        self.apply_job_button.grid(row=14, column=6, pady=10, ipadx=10, ipady=3)
+
+        self.removable_widgets.extend([self.treeview, extra_space, self.apply_job_button])
+
+    def select_item(self):
+        current_item = self.treeview.focus()
+        print(self.treeview.item(current_item))
 
     def applications(self):
         self.destroyer()
+        self.master.geometry("500x500")
+        tv = ttk.Treeview(self.master)
+        # TODO maybe remove the other 3 username variables from scope
+        tv['columns'] = ('my_application_status')
+        tv.heading("#0", text='Job name')
+        tv.column("#0", anchor='center', width=150)
+        tv.heading("my_application_status", text='Status')
+        tv.column("0", anchor='center', width=150)
+        tv.grid(sticky=NSEW)
+        extra_space = Label(self.master)
+        extra_space.grid(row=12, column=5, pady=50, padx=5)
+        self.treeview = tv
+        self.treeview.grid(row=2, column=6, rowspan=12)
 
+        # Populate tree view with applications
+        my_applications = mysqlFunctions.fetch_my_applications(self.stored_username)
+        for var in my_applications:
+            self.treeview.insert('', 'end', text=var[0], values=var[1:])
+
+        def delete_my_application():
+            mysqlFunctions.delete_my_application()
+        delete_application_button = Button(self.master, text='Delete application', command=self.select_item)
+        delete_application_button.grid(row=14, column=6, pady=10, ipadx=10, ipady=3)
+        self.removable_widgets.extend([self.treeview, delete_application_button])
+
+
+
+
+# TODO check this
+
+
+'''
+def finish(self):
+    self.master.destroy()
+'''
 
 if __name__ == '__main__':
     root = Tk()

@@ -27,12 +27,42 @@ class Common(object):
         Calling this will essentially return you to the starting panel
 
         """
+
         try:
             for self.widget in self.removable_widgets:
                 self.widget.destroy()
         except AttributeError:
             pass
 
+def delete_my_application():
+    #TODO implement this
+    pass
+
+def fetch_my_applications(username):
+    cursor = my_database.cursor()
+    # TODO need to select position + status
+    try:
+        cursor.execute("""SELECT position FROM applies INNER JOIN job ON job.id=applies.job_id 
+                        WHERE applies.cand_usrname=%s """, ([username]))
+        result = cursor.fetchall()
+        return result
+    finally:
+        cursor.close()
+
+
+def fetch_available_jobs():
+
+    cursor = my_database.cursor()
+
+    try:
+        #TODO change <= to >=
+        cursor.execute("""SELECT start_date, salary, position, edra, recruiter, announce_date, submission_date
+                        FROM job WHERE submission_date <= CURDATE();""")
+        result = cursor.fetchall()
+        return result
+
+    finally:
+        cursor.close()
 
 def edit_info(username, info_list_updated):
     """
@@ -119,7 +149,8 @@ def fetch_candidate_info(candidate_username):
     """
 
     :param candidate_username: String: Candidate's username to fetch info for
-    :return: List of Strings: password, name, surname, email, certificates, sistatikes, biography for given candidate
+    :return: List of Strings: password, name, surname, email, certificates,
+             sistatikes, biography for given candidate
     """
     cursor = my_database.cursor()
     cursor.execute("""SELECT password,name,surname,email,certificates,sistatikes,bio FROM candidate 
