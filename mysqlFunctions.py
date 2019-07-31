@@ -34,9 +34,21 @@ class Common(object):
         except AttributeError:
             pass
 
-def delete_my_application():
-    #TODO implement this
-    pass
+def delete_my_application(username,selected_application):
+
+    cursor = my_database.cursor()
+    try:
+        #TODO trigger for submission date checking
+        cursor.execute(""" DELETE FROM t1 USING applies t1 INNER JOIN job t2 ON (t1.job_id=t2.id) WHERE
+                        cand_usrname=%s and position=%s """, (username, selected_application))
+        my_database.commit()
+        return 'Success'
+    except MySQLdb.Error as e:
+        my_database.rollback()
+        return 'MySQL Error [%d]: %s' % (e.args[0], e.args[1])
+    finally:
+        cursor.close()
+
 
 def fetch_my_applications(username):
     cursor = my_database.cursor()

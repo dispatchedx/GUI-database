@@ -9,7 +9,7 @@ import admin_window
 class CandidateWindow(admin_window.AdminWindow):
     def __init__(self, master, stored_username):
         #TODO change liagourma to stored_username
-        self.stored_username = 'liagourma'#stored_username
+        self.stored_username = 'cleogeo'#stored_username
         mysqlFunctions.Common.__init__(self)
         self.master = master
         master.title('Candidate control panel')
@@ -113,9 +113,27 @@ class CandidateWindow(admin_window.AdminWindow):
 
     def select_item(self):
         current_item = self.treeview.focus()
-        print(self.treeview.item(current_item))
+        job_name = self.treeview.item(current_item)['text']
+        return job_name
 
     def applications(self):
+        def delete_my_application():
+            selected_application = self.select_item()
+            if selected_application == '':
+                # If nothing is selected, show error
+                messagebox.showerror("Error", 'You must select an application first')
+                return -1
+
+            result = mysqlFunctions.delete_my_application(self.stored_username, selected_application)
+            if result == 'Success':
+                messagebox.showinfo("Success", f'Application successfully deleted')
+
+                # Delete item from tree view
+                selected_item = self.treeview.selection()[0]
+                self.treeview.delete(selected_item)
+            else:
+                messagebox.showerror("Error", result)
+
         self.destroyer()
         self.master.geometry("500x500")
         tv = ttk.Treeview(self.master)
@@ -130,16 +148,14 @@ class CandidateWindow(admin_window.AdminWindow):
         extra_space.grid(row=12, column=5, pady=50, padx=5)
         self.treeview = tv
         self.treeview.grid(row=2, column=6, rowspan=12)
+        delete_application_button = Button(self.master, text='Delete application', command=delete_my_application)
+        delete_application_button.grid(row=14, column=6, pady=10, ipadx=10, ipady=3)
 
         # Populate tree view with applications
         my_applications = mysqlFunctions.fetch_my_applications(self.stored_username)
         for var in my_applications:
             self.treeview.insert('', 'end', text=var[0], values=var[1:])
 
-        def delete_my_application():
-            mysqlFunctions.delete_my_application()
-        delete_application_button = Button(self.master, text='Delete application', command=self.select_item)
-        delete_application_button.grid(row=14, column=6, pady=10, ipadx=10, ipady=3)
         self.removable_widgets.extend([self.treeview, delete_application_button])
 
 
