@@ -25,7 +25,7 @@ class AdminWindow(mysqlFunctions.Common):
                                           command=self.add_antikeim)
         self.add_business_areas_button = Button(self.master, text='Add business areas',
                                                 command=self.add_business_areas)
-        self.change_history_button = Button(self.master, text='Change history', command=self.change_history)
+        self.changes_history_button = Button(self.master, text='Changes history', command=self.changes_history)
 
     def grid_widgets(self):
         self.upper_left_space.grid(padx=10, pady=0)
@@ -33,7 +33,7 @@ class AdminWindow(mysqlFunctions.Common):
         self.register_recruiter_button.grid(row=3, column=3, sticky=NSEW, ipady=2)
         self.add_antikeim_button.grid(row=4, column=3, sticky=NSEW, ipady=2, pady=5)
         self.add_business_areas_button.grid(row=5, column=3, sticky=NSEW, ipady=2)
-        self.change_history_button.grid(row=6, column=3, sticky=NSEW, ipady=2, pady=5)
+        self.changes_history_button.grid(row=6, column=3, sticky=NSEW, ipady=2, pady=5)
 
     def add_antikeim(self):
 
@@ -81,7 +81,7 @@ class AdminWindow(mysqlFunctions.Common):
         # TODO implement this but need mysql part
         self.destroyer()
 
-    def change_history(self):
+    def changes_history(self):
         # TODO implement this but need mysql part
         self.destroyer()
         self.change_h_for_table = Label(self.master, text='Show history for table')
@@ -104,7 +104,6 @@ class AdminWindow(mysqlFunctions.Common):
                                   self.change_h_for_table,
                                   self.change_h_for_table_combobox]
 
-
     def submit(self, table_name, primary_key):
         # TODO maybe reg_date is automatic
         #self.table_name = table_name
@@ -124,9 +123,6 @@ class AdminWindow(mysqlFunctions.Common):
             messagebox.showinfo("Success", f'Registration of {primary_key} was a success')
         else:
             messagebox.showerror("Error", result)
-
-
-
 
 
 if __name__ == '__main__':

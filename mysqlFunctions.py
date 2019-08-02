@@ -1,6 +1,6 @@
 import MySQLdb
 from tkinter import *
-
+from tkinter import messagebox
 host = '127.128.0.1'
 port = 3306
 user = 'root'
@@ -166,7 +166,56 @@ class Common(object):
                                        self.bio_entry,
                                        self.submit_button
                                        ])
-def delete_my_application(username,selected_application):
+
+    def view_profile(self, type_of_user):
+        self.destroyer()
+        self.master.geometry("500x500")
+        if type_of_user == 'recruiter':
+            self.register_recruiter()
+            self.info_list = fetch_recruiter_info(self.stored_username)
+        elif type_of_user == 'candidate':
+            self.register_candidate()
+            self.info_list = fetch_candidate_info(self.stored_username)
+        self.submit_button.destroy()
+        self.edit_button = Button(self.master, text='edit info', command=lambda: self.edit(type_of_user))
+        self.edit_button.grid(row=10, column=6, pady=5, sticky=NSEW)
+        self.username_entry.insert(END, self.stored_username)
+        self.username_entry.config(state='disabled')
+        self.entry_widgets = [widget for widget in self.removable_widgets if 'entry' in str(widget)]
+        self.removable_widgets.append(self.edit_button)
+        # Fill each entry with corresponding info and make it readonly
+        for widget, info in zip(self.entry_widgets[1:], self.info_list):
+                widget.insert(END, info)
+                widget.config(state='readonly')
+
+    def edit(self, type_of_user):
+        """
+         :var: entry_widget[0]: is username and we don't want to change it so we put everything else
+         to normal state which means its editable
+
+        """
+        for widget in self.entry_widgets[1:]:
+                widget.config(state='normal')
+        self.edit_button.config(text='done editing', command=lambda: self.done_edit(type_of_user))
+
+    def done_edit(self, type_of_user):
+        """
+        :var: info_list_updated: List of strings: contains the updated info in order: [password, name, surname, email,
+        certificates, sistatikes, bio]
+        """
+        for widget in self.entry_widgets[1:]:
+                widget.config(state='readonly')
+        self.edit_button.config(text='edit info', command=lambda: self.edit(type_of_user))
+        self.info_list_updated = [entry.get() for entry in self.entry_widgets[1:]]
+        # TODO if return success
+        result = edit_info(self.stored_username, self.info_list_updated, type_of_user)
+        if result == 'Success':
+            messagebox.showinfo("Success", f'Successfully updated all values.')
+        else:
+            messagebox.showerror("Error", result)
+
+
+def delete_my_application(username, selected_application):
 
     cursor = my_database.cursor()
     try:
@@ -208,7 +257,8 @@ def fetch_available_jobs():
     finally:
         cursor.close()
 
-def edit_info(username, info_list_updated):
+
+def edit_info(username, info_list_updated, type_of_user):
     """
     :param username: Username
     :param: info_list_updated: List of strings: contains the updated info in order: [password, name, surname, email,
@@ -216,26 +266,41 @@ def edit_info(username, info_list_updated):
     :return:
     """
     cursor = my_database.cursor()
-    try:
-        cursor.execute("""UPDATE  user SET password= %s, name=%s, surname=%s, email=%s WHERE user.username=%s""",
-                       (info_list_updated[0], info_list_updated[1], info_list_updated[2], info_list_updated[3],
-                        username))
-        cursor.execute("""UPDATE candidate SET  certificates=%s, sistatikes=%s, bio=%s WHERE candidate.username=%s""",
-                       (info_list_updated[4], info_list_updated[5], info_list_updated[6], username))
-        my_database.commit()
-        return'Success'
-    except MySQLdb.Error as e:
-        my_database.rollback()
-        return 'MySQL Error [%d]: %s' % (e.args[0], e.args[1])
-    finally:
-        cursor.close()
+    if type_of_user == 'candidate':
+        try:
+            cursor.execute("""UPDATE  user SET password=%s, name=%s, surname=%s, email=%s WHERE user.username=%s""",
+                           (info_list_updated[0], info_list_updated[1], info_list_updated[2], info_list_updated[3],
+                            username))
+            cursor.execute("""UPDATE candidate SET  certificates=%s, sistatikes=%s, bio=%s WHERE candidate.username=%s""",
+                           (info_list_updated[4], info_list_updated[5], info_list_updated[6], username))
+            my_database.commit()
+            return'Success'
+        except MySQLdb.Error as e:
+            my_database.rollback()
+            return 'MySQL Error [%d]: %s' % (e.args[0], e.args[1])
+        finally:
+            cursor.close()
+    elif type_of_user == 'recruiter':
+        try:
+            cursor.execute("""UPDATE  user SET password=%s, name=%s, surname=%s, email=%s WHERE user.username=%s""",
+                           (info_list_updated[0], info_list_updated[1], info_list_updated[2], info_list_updated[3],
+                            username))
+            cursor.execute("""UPDATE recruiter SET exp_years=%s, firm=%s""",
+                           (info_list_updated[4], info_list_updated[5]))
+            my_database.commit()
+            return 'Success'
+        except MySQLdb.Error as e:
+            my_database.rollback()
+            return 'MySQL Error [%d]: %s' % (e.args[0], e.args[1])
+        finally:
+            cursor.close()
 
 
 def login(username, password):
     """
     :param username: input username
     :param password: input password
-    :return: Α String containing the type of user. Can be either "candidate", "recruiter", "admin".
+    :return: Α String containing the type_of_user of user. Can be either "candidate", "recruiter", "admin".
      If user doesnt exist returns "None"
     """
     cursor = my_database.cursor()
@@ -265,11 +330,7 @@ def fetch_belongs():
     cursor = my_database.cursor()
     cursor.execute('SELECT distinct belongs_to FROM antikeim WHERE belongs_to IS NOT NULL;')
     result = cursor.fetchall()
-    values_list = []
-    # Convert tuple to list
-    for val in result:
-        values_list.append(''.join(val))
-    cursor.close()
+    values_list = list(result)
     return values_list
 
 
@@ -282,10 +343,7 @@ def fetch_users():
     cursor.execute('SELECT username from user')
     result = cursor.fetchall()
     # Convert tuple to list
-    users_list = []
-    for var in result:
-        users_list.append(''.join(var))
-    cursor.close()
+    users_list = list(result)
     return users_list
 
 
@@ -297,29 +355,20 @@ def fetch_candidate_info(candidate_username):
              sistatikes, biography for given candidate
     """
     cursor = my_database.cursor()
-    cursor.execute("""SELECT password,name,surname,email,certificates,sistatikes,bio FROM candidate 
-    INNER JOIN user ON user.username=candidate.username WHERE user.username=%s""", [candidate_username])
+    cursor.execute("""SELECT password,name,surname,email,certificates,sistatikes,bio FROM candidate INNER JOIN 
+                    user ON user.username=candidate.username WHERE user.username=%s""", [candidate_username])
     result = cursor.fetchone()
     # Convert tuple to list
-    info_list = []
-    for var in result:
-        info_list.append(''.join(var))
-    cursor.close()
-    return info_list
+    return list(result)
 
+def fetch_recruiter_info(recruiter_username):
 
-''' # Useless function
-def fetch_tables():
     cursor = my_database.cursor()
-    cursor.execute('SHOW TABLES;')
-    result = cursor.fetchall()
-    # Convert tuple to list
-    tables_list = []
-    for var in result:
-        tables_list.append(''.join(var))
-    cursor.close()
-    return tables_list
-'''
+    cursor.execute("""SELECT password, name, surname, email, exp_years, firm FROM recruiter INNER JOIN 
+                    user ON user.username=recruiter.username WHERE user.username=%s""", [recruiter_username])
+    result = cursor.fetchone()
+    info_list = list(result)
+    return info_list
 
 
 def register(info_list, table_name):
