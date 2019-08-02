@@ -2,22 +2,8 @@ from tkinter import *
 import mysqlFunctions
 import admin_window
 import candidate_window
+import recruiter_window
 # Admin credentials: Username=password=admin
-
-
-class RecruiterWindow:
-    # Tables: etaireia (link=AFM) recruiter
-    def __init__(self, master):
-        self.master = master
-        master.title("Recruiter control panel")
-        self.create_widgets()
-        self.grid_widgets()
-
-    def create_widgets(self):
-        pass
-
-    def grid_widgets(self):
-        pass
 
 
 def test():
@@ -80,7 +66,7 @@ class LoginWindow:
         # TODO make windows independent of the login page
         if self.type_of_user == 'recruiter':
             root2 = Toplevel(self.master)
-            recruiter = RecruiterWindow(root2)
+            recruiter = recruiter_window.RecruiterWindow(root2, self.input_username.get())
 
         elif self.type_of_user == 'candidate':
             root2 = Toplevel(self.master)

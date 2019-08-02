@@ -1,12 +1,10 @@
 from tkinter import *
 import mysqlFunctions
-import datetime
 from tkinter import messagebox
 from tkinter import ttk
-import admin_window
 
 
-class CandidateWindow(admin_window.AdminWindow):
+class CandidateWindow(mysqlFunctions.Common):
     def __init__(self, master, stored_username):
         #TODO change liagourma to stored_username
         self.stored_username = 'cleogeo'#stored_username
