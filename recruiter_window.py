@@ -28,15 +28,19 @@ class RecruiterWindow(mysqlFunctions.Common):
         pass
 
     def my_company(self):
+        self.destroyer()
         pass
 
     def add_job(self):
+        self.destroyer()
         pass
 
     def my_jobs(self):
+        self.destroyer()
         pass
 
     def all_jobs(self):
+        self.destroyer()
         pass
 
 

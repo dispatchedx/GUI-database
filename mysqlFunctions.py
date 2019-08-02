@@ -59,6 +59,7 @@ class Common(object):
         # Entry text boxes
         self.username_entry = Entry(self.master, textvariable=self.input_username)
         self.password_entry = Entry(self.master, textvariable=self.input_password)
+        self.password_entry.config(show='*')
         self.name_entry = Entry(self.master, textvariable=self.input_name)
         self.surname_entry = Entry(self.master, textvariable=self.input_surname)
         self.email_entry = Entry(self.master, textvariable=self.input_email)
@@ -193,9 +194,14 @@ class Common(object):
          :var: entry_widget[0]: is username and we don't want to change it so we put everything else
          to normal state which means its editable
 
+         :var: entry_widget[1]: is password field and we don't want to show it so we use config(show='*')
+
         """
         for widget in self.entry_widgets[1:]:
-                widget.config(state='normal')
+            widget.config(state='normal')
+
+        self.entry_widgets[1].config(show='')
+        # TODO maybe not, after done editing password remains visible
         self.edit_button.config(text='done editing', command=lambda: self.done_edit(type_of_user))
 
     def done_edit(self, type_of_user):
