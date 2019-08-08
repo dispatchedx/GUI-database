@@ -14,7 +14,6 @@ class CandidateWindow(mysqlFunctions.Common):
         master.geometry("500x500")
         self.create_widgets()
 
-
     def create_widgets(self):
         self.upper_left_space = Label(self.master)
         self.upper_left_space.grid(padx=10, pady=0)
@@ -27,7 +26,6 @@ class CandidateWindow(mysqlFunctions.Common):
 
         self.my_application = Button(self.master, text='My applications', command=self.applications)
         self.my_application.grid(row=4, column=3, sticky=NSEW, ipady=2, ipadx=20, pady=5)
-
 
     def available_jobs(self):
         self.destroyer()
@@ -53,7 +51,7 @@ class CandidateWindow(mysqlFunctions.Common):
         extra_space = Label(self.master)
         extra_space.grid(row=12, column=5, pady=50, padx=5)
 
-        self.treeview= tv
+        self.treeview = tv
         self.treeview.grid(row=2, column=6, rowspan=12)
 
         available_jobs = mysqlFunctions.fetch_available_jobs()
@@ -62,10 +60,21 @@ class CandidateWindow(mysqlFunctions.Common):
             self.treeview.insert('', 'end', text=job[0], values=job[1:])
         self.treeview.grid_rowconfigure(2, weight=0)
 
-        self.apply_job_button = Button(self.master, text='Apply to job(s)')
+        self.apply_job_button = Button(self.master, text='Apply to job(s)', command=self.apply_to_jobs)
         self.apply_job_button.grid(row=14, column=6, pady=10, ipadx=10, ipady=3)
 
         self.removable_widgets.extend([self.treeview, extra_space, self.apply_job_button])
+
+    def apply_to_jobs(self):
+        selected_job = self.treeview.selection()[0]
+        # Get job name for selected job
+        job_name = self.treeview.item(selected_job)['values'][1]
+        result = mysqlFunctions.apply_to_jobs(self.stored_username, job_name)
+        if result == 'Success':
+            self.destroyer()
+            messagebox.showinfo("Success", f'Application to {job_name} was a success')
+        else:
+            messagebox.showerror("Error", result)
 
     def select_item(self):
         current_item = self.treeview.focus()
@@ -97,6 +106,7 @@ class CandidateWindow(mysqlFunctions.Common):
         tv['columns'] = ('my_application_status')
         tv.heading("#0", text='Job name')
         tv.column("#0", anchor='center', width=150)
+        # TODO fetch status
         tv.heading("my_application_status", text='Status')
         tv.column("0", anchor='center', width=150)
         tv.grid(sticky=NSEW)

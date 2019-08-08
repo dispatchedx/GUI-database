@@ -338,6 +338,18 @@ def login(username, password):
     finally:
         cursor.close()
 
+def apply_to_jobs(candidate_username, job_name):
+    cursor = my_database.cursor()
+    try:
+        cursor.execute("""INSERT INTO applies (cand_usrname, job_id)  SELECT %s, id FROM job WHERE job.position=%s""",
+                           (candidate_username, job_name))
+        my_database.commit()
+        return 'Success'
+    except MySQLdb.Error as e:
+        my_database.rollback()
+        return 'MySQL Error [%d]: %s' % (e.args[0], e.args[1])
+    finally:
+        cursor.close()
 
 def fetch_all_jobs(recruiter_username):
     cursor = my_database.cursor()
@@ -376,7 +388,6 @@ def fetch_belongs():
 
 def fetch_users():
     """
-
     :return: List of strings: all usernames in the database
     """
     cursor = my_database.cursor()
@@ -390,7 +401,6 @@ def fetch_users():
 
 def fetch_candidate_info(candidate_username):
     """
-
     :param candidate_username: String: Candidate's username to fetch info for
     :return: List of Strings: password, name, surname, email, certificates,
              sistatikes, biography for given candidate
@@ -417,7 +427,7 @@ def fetch_recruiter_info(recruiter_username):
 
 def fetch_etaireia_info(recruiter_username):
     cursor = my_database.cursor()
-    cursor.execute("""select AFM, DOY, name, tel, street, num, city, country, sector_id from etaireia INNER JOIN
+    cursor.execute("""select AFM, DOY, name, tel, street, num, city, country, sector from etaireia INNER JOIN
                     recruiter ON etaireia.AFM=recruiter.firm WHERE recruiter.username=%s""", [recruiter_username])
 
     result = cursor.fetchone()
