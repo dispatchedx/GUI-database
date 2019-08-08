@@ -1,12 +1,12 @@
 import MySQLdb
 from tkinter import *
 from tkinter import messagebox
+
 host = '127.128.0.1'
 port = 3306
 user = 'root'
 password = 'root'
 database = 'erecruit'
-
 
 my_database = MySQLdb.connect(
     host=host,
@@ -15,7 +15,6 @@ my_database = MySQLdb.connect(
     passwd=password,
     db=str(database)
 )
-
 
 class Common(object):
     """
@@ -178,7 +177,7 @@ class Common(object):
             self.register_candidate()
             self.info_list = fetch_candidate_info(self.stored_username)
         self.submit_button.destroy()
-        self.edit_button = Button(self.master, text='edit info', command=lambda: self.edit(type_of_user))
+        self.edit_button = Button(self.master, text='Edit info', command=lambda: self.edit(type_of_user))
         self.edit_button.grid(row=10, column=6, pady=5, sticky=NSEW)
         self.username_entry.insert(END, self.stored_username)
         self.username_entry.config(state='disabled')
@@ -188,6 +187,9 @@ class Common(object):
         for widget, info in zip(self.entry_widgets[1:], self.info_list):
                 widget.insert(END, info)
                 widget.config(state='readonly')
+        # recruiter's AFM must not be editable
+        if type_of_user == 'recruiter':
+            self.entry_widgets[-1].config(state='disabled')
 
     def edit(self, type_of_user):
         """
@@ -199,7 +201,9 @@ class Common(object):
         """
         for widget in self.entry_widgets[1:]:
             widget.config(state='normal')
-
+        # recruiter's AFM must not be editable
+        if type_of_user == 'recruiter':
+            self.entry_widgets[-1].config(state='disabled')
         self.entry_widgets[1].config(show='')
         # TODO maybe not, after done editing password remains visible
         self.edit_button.config(text='done editing', command=lambda: self.done_edit(type_of_user))
@@ -211,9 +215,8 @@ class Common(object):
         """
         for widget in self.entry_widgets[1:]:
                 widget.config(state='readonly')
-        self.edit_button.config(text='edit info', command=lambda: self.edit(type_of_user))
+        self.edit_button.config(text='Edit info', command=lambda: self.edit(type_of_user))
         self.info_list_updated = [entry.get() for entry in self.entry_widgets[1:]]
-        # TODO if return success
         result = edit_info(self.stored_username, self.info_list_updated, type_of_user)
         if result == 'Success':
             messagebox.showinfo("Success", f'Successfully updated all values.')
@@ -309,6 +312,14 @@ def login(username, password):
     :return: Α String containing the type_of_user of user. Can be either "candidate", "recruiter", "admin".
      If user doesnt exist returns "None"
     """
+    # TODO does this even work ? replace root with username, password
+    my_database = MySQLdb.connect(
+        host=host,
+        port=port,
+        user='root',
+        passwd='root',
+        db=str(database)
+    )
     cursor = my_database.cursor()
     cursor.execute("""SELECT username, password FROM user 
     WHERE username = %s AND password = %s""", (username, password,))
@@ -337,6 +348,7 @@ def fetch_belongs():
     cursor.execute('SELECT distinct belongs_to FROM antikeim WHERE belongs_to IS NOT NULL;')
     result = cursor.fetchall()
     values_list = list(result)
+    cursor.close()
     return values_list
 
 
@@ -350,6 +362,7 @@ def fetch_users():
     result = cursor.fetchall()
     # Convert tuple to list
     users_list = list(result)
+    cursor.close()
     return users_list
 
 
@@ -365,7 +378,9 @@ def fetch_candidate_info(candidate_username):
                     user ON user.username=candidate.username WHERE user.username=%s""", [candidate_username])
     result = cursor.fetchone()
     # Convert tuple to list
+    cursor.close()
     return list(result)
+
 
 def fetch_recruiter_info(recruiter_username):
 
@@ -374,7 +389,34 @@ def fetch_recruiter_info(recruiter_username):
                     user ON user.username=recruiter.username WHERE user.username=%s""", [recruiter_username])
     result = cursor.fetchone()
     info_list = list(result)
+    cursor.close()
     return info_list
+
+
+def fetch_etaireia_info(recruiter_username):
+    cursor = my_database.cursor()
+    cursor.execute("""select AFM, DOY, name, tel, street, num, city, country, sector_id from etaireia INNER JOIN
+                    recruiter ON etaireia.AFM=recruiter.firm WHERE recruiter.username=%s""", [recruiter_username])
+
+    result = cursor.fetchone()
+    info_list = list(result)
+    cursor.close()
+    return info_list
+
+
+def done_edit_etaireia(recruiter_afm, info_list):
+    cursor = my_database.cursor()
+
+    try:
+        cursor.execute("""UPDATE etaireia SET tel=%s, street=%s, num=%s, city=%s, country=%s WHERE etaireia.AFM=%s""",
+                       (info_list[0], info_list[1], info_list[2], info_list[3], info_list[4], recruiter_afm))
+        my_database.commit()
+        return 'Success'
+    except MySQLdb.Error as e:
+        my_database.rollback()
+        return 'MySQL Error [%d]: %s' % (e.args[0], e.args[1])
+    finally:
+        cursor.close()
 
 
 def register(info_list, table_name):
