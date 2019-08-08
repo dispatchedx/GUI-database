@@ -1,6 +1,8 @@
 import mysqlFunctions
 from tkinter import *
 from tkinter import messagebox
+from tkinter import ttk
+
 
 class RecruiterWindow(mysqlFunctions.Common):
     def __init__(self, master, stored_username):
@@ -23,12 +25,15 @@ class RecruiterWindow(mysqlFunctions.Common):
         self.my_company_button = Button(self.master, text='My company', command=self.my_company)
         self.my_company_button.grid(row=3, column=3, sticky=NSEW, ipady=2, ipadx=20, pady=5)
 
+        self.all_jobs_button = Button(self.master, text='All jobs', command=self.all_jobs)
+        self.all_jobs_button.grid(row=4,column=3,sticky=NSEW,ipady=2,ipadx=20,pady=5)
         # TODO my_jobs, all_jobs, add_job ...
     def grid_widgets(self):
         pass
 
     def my_company(self):
         self.destroyer()
+        self.master.geometry("500x500")
         # TODO maybe add sector as well?
         # Variables
         input_telephone = StringVar()
@@ -102,6 +107,24 @@ class RecruiterWindow(mysqlFunctions.Common):
         self.edit_button = Button(self.master, text='Edit info', command=self.edit_company)
         self.edit_button.grid(row=11, column=6, sticky=NSEW)
 
+        self.removable_widgets.extend([afm,
+                                       doy,
+                                       name,
+                                       telephone,
+                                       street,
+                                       street_number,
+                                       city,
+                                       country,
+                                       afm_entry,
+                                       doy_entry,
+                                       name_entry,
+                                       telephone_entry,
+                                       street_entry,
+                                       street_number_entry,
+                                       city_entry,
+                                       country_entry,
+                                       self.edit_button])
+
     def edit_company(self):
         for widget in self.entry_widgets[3:]:
             widget.config(state='normal')
@@ -133,7 +156,47 @@ class RecruiterWindow(mysqlFunctions.Common):
 
     def all_jobs(self):
         self.destroyer()
-        pass
+        self.master.geometry("1000x500")
+        tv = ttk.Treeview(self.master)
+        # TODO maybe remove the other 3 username variables from scope
+        tv['columns'] = ('salary', 'position', 'edra', 'recruiter', 'announce_date', 'submission_date')
+        tv.heading("#0", text='Start date')
+        tv.column('#0', anchor='center', width=100)
+        tv.heading("salary", text='Salary')
+        tv.column('salary', anchor='center', width=50)
+        tv.heading("position", text='Position')
+        tv.column('position', anchor='center', width=200)
+        tv.heading("edra", text='Edra')
+        tv.column('edra', anchor='center', width=100)
+        tv.heading("recruiter", text='Recruiter')
+        tv.column('recruiter', anchor='center', width=70)
+        tv.heading("announce_date", text='Announce date')
+        tv.column('announce_date', anchor='center', width=115)
+        tv.heading("submission_date", text='Submission date')
+        tv.column('submission_date', anchor='center', width=100)
+        tv.grid(sticky=NSEW)
+        tv.grid(sticky=NSEW)
+        extra_space = Label(self.master)
+        extra_space.grid(row=12, column=5, pady=50, padx=5)
+        self.treeview = tv
+        self.treeview.grid(row=2, column=6, rowspan=12)
+        edit_job_button = Button(self.master, text='Edit job', command=self.edit_job)
+        edit_job_button.grid(row=14, column=6, pady=10, ipadx=10, ipady=3)
+
+        # Populate tree view with applications
+        all_jobs = mysqlFunctions.fetch_all_jobs(self.stored_username)
+        for arr in all_jobs:
+            for job in arr:
+                self.treeview.insert('', 'end', text=job[0], values=job[1:])
+
+        self.removable_widgets.extend([self.treeview, edit_job_button])
+
+    def edit_job(self):
+        selected = self.treeview.selection()[0]
+        print(self.treeview.item(selected)['values'])
+        x = self.treeview.get_children()
+        #for child in x:
+            #print(child)
 
 
 if __name__ == '__main__':

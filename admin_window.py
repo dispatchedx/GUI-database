@@ -48,10 +48,12 @@ class AdminWindow(mysqlFunctions.Common):
 
         # Entries and List boxes
         self.title_entry = Entry(self.master, textvariable=self.input_title)
+        # TODO this should be automatic from database
         self.description_combobox = ttk.Combobox(self.master, state="readonly", values=['Level one element',
-                                                                                        'Level two element'])
-        self.values_belongs = mysqlFunctions.fetch_belongs()
-        belongs_list = []
+                                                                                        'Level two element',
+                                                                                        'Level three element'])
+        belongs_list = mysqlFunctions.fetch_belongs()
+        belongs_list.append('None')
         # Adding values by iterating belongs_list
         self.belongs_combobox = ttk.Combobox(self.master, state="readonly", values=[value for value in belongs_list])
         # Grid
@@ -81,6 +83,55 @@ class AdminWindow(mysqlFunctions.Common):
         # TODO implement this but need mysql part
         self.destroyer()
 
+        def submit():
+            info_list = [input_title.get(),
+                         input_description.get(),
+                         belongs_to_combobox.selection_get()]
+
+            result = mysqlFunctions.register(info_list, 'business_areas')
+            if result == 'Success':
+                self.destroyer()
+                messagebox.showinfo("Success", f'Registration of {info_list[0]} was a success')
+            else:
+                messagebox.showerror("Error", result)
+        # Variables
+        input_title = StringVar()
+        input_description = StringVar()
+
+        # Labels
+        title = Label(self.master, text='Title')
+        description = Label(self.master, text='Description')
+        belongs_to = Label(self.master, text='Belongs to')
+
+        # Entries
+        title_entry = Entry(self.master, textvariable=input_title)
+        description_entry = Entry(self.master, textvariable=input_description)
+
+        # Grid stuff
+        title.grid(row=2, column=5, padx=10, sticky=E)
+        title_entry.grid(row=2, column=6, ipady=1, sticky=E+W)
+        description.grid(row=3, column=5, padx=10, sticky=E)
+        description_entry.grid(row=3, column=6, sticky=E+W)
+        belongs_to.grid(row=4, column=5, padx=10, sticky=E)
+
+        submit_button = Button(self.master, text='Submit', command=submit)
+        submit_button.grid(row=5, column=6, sticky=NSEW)
+
+        belongs_list = mysqlFunctions.fetch_business_areas()
+        belongs_list.append('None')
+        # Adding values by iterating belongs_list
+        belongs_to_combobox = ttk.Combobox(self.master, state="readonly", values=[value for value in belongs_list])
+        belongs_to_combobox.grid(row=4, column=6)
+
+        self.removable_widgets = [submit_button,
+                                  title,
+                                  title_entry,
+                                  description,
+                                  description_entry,
+                                  belongs_to,
+                                  belongs_to_combobox,
+                                  ]
+
     def changes_history(self):
         # TODO implement this but need mysql part
         self.destroyer()
@@ -106,7 +157,6 @@ class AdminWindow(mysqlFunctions.Common):
 
     def submit(self, table_name, primary_key):
         # TODO maybe reg_date is automatic
-        #self.table_name = table_name
         self.info_list = []
         for var in self.variables:
             self.info_list.append(var.get())

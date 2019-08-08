@@ -339,13 +339,35 @@ def login(username, password):
         cursor.close()
 
 
+def fetch_all_jobs(recruiter_username):
+    cursor = my_database.cursor()
+    cursor.execute("""SELECT start_date, salary, position, edra, recruiter, announce_date, submission_date FROM job
+                        WHERE job.recruiter=%s""", [recruiter_username])
+    my_jobs = list(cursor.fetchall())
+    cursor.execute("""SELECT start_date, salary, position, edra, recruiter, announce_date, submission_date FROM job
+                        WHERE job.recruiter<>%s""", [recruiter_username])
+    other_jobs = list(cursor.fetchall())
+    cursor.close()
+    return [my_jobs, other_jobs]
+
+
+def fetch_business_areas():
+    """
+    :return: List of strings: all unique belongs_to in table sector
+    """
+    cursor = my_database.cursor()
+    cursor.execute('SELECT distinct title FROM sector')
+    result = cursor.fetchall()
+    values_list = list(result)
+    cursor.close()
+    return values_list
+
 def fetch_belongs():
     """
-
     :return: List of strings: all unique belongs_to in table antikeim
     """
     cursor = my_database.cursor()
-    cursor.execute('SELECT distinct belongs_to FROM antikeim WHERE belongs_to IS NOT NULL;')
+    cursor.execute('SELECT distinct title FROM antikeim')
     result = cursor.fetchall()
     values_list = list(result)
     cursor.close()
@@ -437,8 +459,15 @@ def register(info_list, table_name):
             cursor.execute("""INSERT INTO candidate (username, bio, sistatikes, certificates) values
              (%s, %s, %s, %s)""", (info_list[0], info_list[6], info_list[7], info_list[8],))
         elif table_name == 'antikeim':
+            if info_list[2] == 'None':
+                info_list[2] = ''
             cursor.execute('INSERT INTO antikeim (Title, descr, belongs_to) VALUES (%s, %s, %s) ',
                            (info_list[0], info_list[1] + ', child of %s' % info_list[2], info_list[2]))
+        elif table_name == 'business_areas':
+            if info_list[2] == 'None':
+                info_list[2] = ''
+            cursor.execute("""INSERT INTO sector (title, description, belongs_to) VALUES (%s, %s, %s)""",
+                           (info_list[0], info_list[1], info_list[2]))
         else:
             return f'Error: no table name {table_name} exits'
         my_database.commit()
