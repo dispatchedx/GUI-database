@@ -66,12 +66,13 @@ class CandidateWindow(mysqlFunctions.Common):
         self.removable_widgets.extend([self.treeview, extra_space, self.apply_job_button])
 
     def apply_to_jobs(self):
+        # TODO maybe show the jobs that you haven't applied yet
         selected_job = self.treeview.selection()[0]
         # Get job name for selected job
         job_name = self.treeview.item(selected_job)['values'][1]
         result = mysqlFunctions.apply_to_jobs(self.stored_username, job_name)
         if result == 'Success':
-            self.destroyer()
+            self.treeview.delete(selected_job)
             messagebox.showinfo("Success", f'Application to {job_name} was a success')
         else:
             messagebox.showerror("Error", result)
