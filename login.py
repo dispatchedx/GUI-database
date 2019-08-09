@@ -4,7 +4,7 @@ import admin_window
 import candidate_window
 import recruiter_window
 # Admin credentials: Username=password=admin
-
+from tkinter import messagebox
 
 class LoginWindow:
     def __init__(self, master):
@@ -57,19 +57,25 @@ class LoginWindow:
         """ Calls mysqlFunctions.login and opens the appropriate window depending on the type of user that
             logged in. If the password if wrong it makes a new label and tells the user
         """
+        def on_closing():
+            if messagebox.askokcancel("Quit", "Do you want to quit?"):
+                root.destroy()
 
         self.type_of_user = mysqlFunctions.login(self.input_username.get(), self.input_password.get())
         # TODO make windows independent of the login page
         if self.type_of_user == 'recruiter':
             root2 = Toplevel(self.master)
             recruiter = recruiter_window.RecruiterWindow(root2, self.input_username.get())
-
+            root2.protocol("WM_DELETE_WINDOW", on_closing)
+            root.withdraw()
         elif self.type_of_user == 'candidate':
             root2 = Toplevel(self.master)
+            root2.protocol("WM_DELETE_WINDOW", on_closing)
             candidate = candidate_window.CandidateWindow(root2, self.input_username.get())
             root.withdraw()
         elif self.type_of_user == 'admin':
             root2 = Toplevel(self.master)
+            root2.protocol("WM_DELETE_WINDOW", on_closing)
             admin = admin_window.AdminWindow(root2)
             # TODO when new window closes, program closes
             root.withdraw()
