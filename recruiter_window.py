@@ -28,6 +28,7 @@ class RecruiterWindow(mysqlFunctions.Common):
         self.all_jobs_button = Button(self.master, text='All jobs', command=self.all_jobs)
         self.all_jobs_button.grid(row=4,column=3,sticky=NSEW,ipady=2,ipadx=20,pady=5)
         # TODO my_jobs, all_jobs, add_job ...
+
     def grid_widgets(self):
         pass
 

@@ -66,7 +66,7 @@ class CandidateWindow(mysqlFunctions.Common):
         self.removable_widgets.extend([self.treeview, extra_space, self.apply_job_button])
 
     def apply_to_jobs(self):
-        # TODO maybe show the jobs that you haven't applied yet
+        # TODO maybe show the jobs that you haven't applied yet or throw a proper error
         selected_job = self.treeview.selection()[0]
         # Get job name for selected job
         job_name = self.treeview.item(selected_job)['values'][1]

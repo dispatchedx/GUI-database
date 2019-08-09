@@ -36,54 +36,55 @@ class AdminWindow(mysqlFunctions.Common):
         self.changes_history_button.grid(row=6, column=3, sticky=NSEW, ipady=2, pady=5)
 
     def add_antikeim(self):
-
         self.destroyer()
+
         # Variables
-        self.input_title = StringVar()
+        input_title = StringVar()
+        input_description = StringVar()
 
         # Labels
-        self.title = Label(self.master, text='    Title')
-        self.description = Label(self.master, text='Description')
-        self.belongs = Label(self.master, text='Belongs to')
+        title = Label(self.master, text='    Title')
+        description = Label(self.master, text='Description') # TODO child of belongs_to is applied automatically is this wrong?
+        belongs = Label(self.master, text='Belongs to')
 
         # Entries and List boxes
-        self.title_entry = Entry(self.master, textvariable=self.input_title)
-        # TODO this should be automatic from database
-        self.description_combobox = ttk.Combobox(self.master, state="readonly", values=['Level one element',
-                                                                                        'Level two element',
-                                                                                        'Level three element'])
+        title_entry = Entry(self.master, textvariable=input_title)
+        title_entry.insert(END, 'antikeim')
+        description_entry = Entry(self.master, textvariable=input_description)
+
+        # Grid stuff
+        title.grid(row=2, column=5, padx=10, sticky=E)
+        title_entry.grid(row=2, column=6, ipady=1, sticky=E+W)
+        description.grid(row=3, column=5, padx=10, sticky=E)
+        description_entry.grid(row=3, column=6, sticky=E + W)
+        belongs.grid(row=4, column=5, padx=10, sticky=E)
+
         belongs_list = mysqlFunctions.fetch_belongs()
         belongs_list.append('None')
         # Adding values by iterating belongs_list
-        self.belongs_combobox = ttk.Combobox(self.master, state="readonly", values=[value for value in belongs_list])
-        # Grid
-        self.title.grid(row=2, column=5, padx=10, sticky=E)
-        self.title_entry.grid(row=2, column=6, ipady=1, sticky=E+W)
-        self.description.grid(row=3, column=5, padx=10, sticky=E)
-        self.description_combobox.grid(row=3, column=6)
-        self.belongs.grid(row=4, column=5, padx=10, sticky=E)
-        self.belongs_combobox.grid(row=4, column=6)
-        self.submit_button = Button(self.master, text='Submit',
-                                    command=lambda: self.submit('antikeim', self.title_entry.get()))
-        self.submit_button.grid(row=5, column=6, sticky=NSEW)
+        belongs_combobox = ttk.Combobox(self.master, state="readonly", values=[value for value in belongs_list])
+        belongs_combobox.grid(row=4, column=6)
+        submit_button = Button(self.master, text='Submit',
+                               command=lambda: self.submit('antikeim', title_entry.get()))
+        submit_button.grid(row=5, column=6, sticky=NSEW)
 
-        self.variables = [self.title_entry,
-                          self.description_combobox,
-                          self.belongs_combobox]
+        self.variables = [title_entry,
+                     description_entry,
+                     belongs_combobox]
 
-        self.removable_widgets = [self.submit_button,
-                                  self.title,
-                                  self.title_entry,
-                                  self.description,
-                                  self.belongs,
-                                  self.belongs_combobox,
-                                  self.description_combobox]
+        self.removable_widgets = [submit_button,
+                                  title,
+                                  title_entry,
+                                  description,
+                                  belongs,
+                                  belongs_combobox,
+                                  description_entry]
 
     def add_business_areas(self):
-        # TODO implement this but need mysql part
+        # TODO delete the commented out stuff
         self.destroyer()
 
-        def submit():
+        '''def submit():
             info_list = [input_title.get(),
                          input_description.get(),
                          belongs_to_combobox.selection_get()]
@@ -93,7 +94,7 @@ class AdminWindow(mysqlFunctions.Common):
                 self.destroyer()
                 messagebox.showinfo("Success", f'Registration of {info_list[0]} was a success')
             else:
-                messagebox.showerror("Error", result)
+                messagebox.showerror("Error", result)'''
         # Variables
         input_title = StringVar()
         input_description = StringVar()
@@ -105,6 +106,7 @@ class AdminWindow(mysqlFunctions.Common):
 
         # Entries
         title_entry = Entry(self.master, textvariable=input_title)
+        title_entry.insert(END, 'business area')
         description_entry = Entry(self.master, textvariable=input_description)
 
         # Grid stuff
@@ -114,7 +116,9 @@ class AdminWindow(mysqlFunctions.Common):
         description_entry.grid(row=3, column=6, sticky=E+W)
         belongs_to.grid(row=4, column=5, padx=10, sticky=E)
 
-        submit_button = Button(self.master, text='Submit', command=submit)
+        submit_button = Button(self.master, text='Submit',
+                               command=lambda: self.submit('business_areas', title_entry.get()))
+        #submit_button = Button(self.master, text='Submit', command=submit)
         submit_button.grid(row=5, column=6, sticky=NSEW)
 
         belongs_list = mysqlFunctions.fetch_business_areas()
@@ -123,6 +127,9 @@ class AdminWindow(mysqlFunctions.Common):
         belongs_to_combobox = ttk.Combobox(self.master, state="readonly", values=[value for value in belongs_list])
         belongs_to_combobox.grid(row=4, column=6)
 
+        self.variables = [title_entry,
+                     description_entry,
+                     belongs_to_combobox]
         self.removable_widgets = [submit_button,
                                   title,
                                   title_entry,
@@ -165,6 +172,8 @@ class AdminWindow(mysqlFunctions.Common):
             self.info_list.insert(4, self.current_datetime.strftime("%Y-%m-%d %H:%M:%S"))
             result = mysqlFunctions.register(self.info_list, table_name)
         elif table_name == 'antikeim':
+            result = mysqlFunctions.register(self.info_list, table_name)
+        elif table_name == 'business_areas':
             result = mysqlFunctions.register(self.info_list, table_name)
         else:
             result = 'Error: no table %s exists' % table_name

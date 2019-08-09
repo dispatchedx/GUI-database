@@ -16,6 +16,7 @@ my_database = MySQLdb.connect(
     db=str(database)
 )
 
+
 class Common(object):
     """
     This class contains functions that are shared between the different control panels
@@ -370,9 +371,12 @@ def fetch_business_areas():
     cursor = my_database.cursor()
     cursor.execute('SELECT distinct title FROM sector')
     result = cursor.fetchall()
+    # There was a bug causing brackets to appear on some elements, this implementation fixes it
     values_list = list(result)
+    values_list = [''.join(x) for x in values_list]
     cursor.close()
     return values_list
+
 
 def fetch_belongs():
     """
@@ -381,7 +385,9 @@ def fetch_belongs():
     cursor = my_database.cursor()
     cursor.execute('SELECT distinct title FROM antikeim')
     result = cursor.fetchall()
+    # There was a bug causing brackets to appear on some elements, this implementation fixes it
     values_list = list(result)
+    values_list = [''.join(x) for x in values_list]
     cursor.close()
     return values_list
 
