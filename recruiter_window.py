@@ -8,7 +8,7 @@ class RecruiterWindow(mysqlFunctions.Common):
     def __init__(self, master, stored_username):
         # Tables: etaireia (link=AFM) recruiter
         # TODO change liagourma to stored_username
-        self.stored_username = 'msmith'#stored_username
+        self.stored_username = stored_username
         mysqlFunctions.Common.__init__(self)
         self.master = master
         master.title('Recruiter control panel')
@@ -36,13 +36,6 @@ class RecruiterWindow(mysqlFunctions.Common):
         self.destroyer()
         self.master.geometry("500x500")
         # TODO maybe add sector as well?
-        # Variables
-        input_telephone = StringVar()
-        input_street = StringVar()
-        input_num = StringVar()
-        input_city = StringVar()
-        input_country = StringVar()
-        input_sector = StringVar()
 
         # Labels
         afm = Label(self.master, text='AFM')
@@ -63,7 +56,7 @@ class RecruiterWindow(mysqlFunctions.Common):
         street_entry = Entry(self.master, textvariable=street)
         street_number_entry = Entry(self.master, textvariable=street_number)
         city_entry = Entry(self.master, textvariable=city)
-        country_entry = Entry(self.master, textvariable=country)
+        country_entry = Entry(self.master)
         # sector_entry = Entry(self.master, textvariable=sector)
         # sector_entry.insert(END,'0')
 

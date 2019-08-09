@@ -6,10 +6,6 @@ import recruiter_window
 # Admin credentials: Username=password=admin
 
 
-def test():
-    print('works')
-
-
 class LoginWindow:
     def __init__(self, master):
         self.master = master

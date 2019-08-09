@@ -7,7 +7,7 @@ port = 3306
 user = 'root'
 password = 'root'
 database = 'erecruit'
-
+# TODO close connection
 my_database = MySQLdb.connect(
     host=host,
     port=port,
@@ -295,8 +295,8 @@ def edit_info(username, info_list_updated, type_of_user):
             cursor.execute("""UPDATE  user SET password=%s, name=%s, surname=%s, email=%s WHERE user.username=%s""",
                            (info_list_updated[0], info_list_updated[1], info_list_updated[2], info_list_updated[3],
                             username))
-            cursor.execute("""UPDATE recruiter SET exp_years=%s, firm=%s""",
-                           (info_list_updated[4], info_list_updated[5]))
+            cursor.execute("""UPDATE recruiter SET exp_years=%s, firm=%s WHERE recruiter.username=%s""",
+                           (info_list_updated[4], info_list_updated[5], username))
             my_database.commit()
             return 'Success'
         except MySQLdb.Error as e:
@@ -313,7 +313,8 @@ def login(username, password):
     :return: Α String containing the type_of_user of user. Can be either "candidate", "recruiter", "admin".
      If user doesnt exist returns "None"
     """
-    # TODO does this even work ? replace root with username, password
+    # TODO is this how it should even work ? replace root with username, password
+
     my_database = MySQLdb.connect(
         host=host,
         port=port,
