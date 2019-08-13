@@ -241,6 +241,19 @@ def delete_my_application(username, selected_application):
         cursor.close()
 
 
+def fetch_job_applications(job_name):
+    cursor = my_database.cursor()
+
+    try:
+        cursor.execute(""" SELECT COUNT(*) FROM applies,job WHERE applies.job_id=job.id
+                            and job.position=%s;""", [job_name])
+        result = cursor.fetchone()
+        applications = list(result)
+        return applications
+    finally:
+        cursor.close()
+
+
 def fetch_my_applications(username):
     cursor = my_database.cursor()
     # TODO need to select position + status
@@ -353,16 +366,24 @@ def apply_to_jobs(candidate_username, job_name):
     finally:
         cursor.close()
 
-def fetch_all_jobs(recruiter_username):
+
+def fetch_all_jobs():
+    cursor = my_database.cursor()
+    cursor.execute("""SELECT start_date, salary, position, edra, recruiter, announce_date, submission_date FROM job""")
+    result = cursor.fetchall()
+    all_jobs = list(result)
+    cursor.close()
+    return all_jobs
+
+
+def fetch_my_jobs(recruiter_username):
     cursor = my_database.cursor()
     cursor.execute("""SELECT start_date, salary, position, edra, recruiter, announce_date, submission_date FROM job
                         WHERE job.recruiter=%s""", [recruiter_username])
-    my_jobs = list(cursor.fetchall())
-    cursor.execute("""SELECT start_date, salary, position, edra, recruiter, announce_date, submission_date FROM job
-                        WHERE job.recruiter<>%s""", [recruiter_username])
-    other_jobs = list(cursor.fetchall())
+    result = cursor.fetchall()
+    my_jobs = list(result)
     cursor.close()
-    return [my_jobs, other_jobs]
+    return my_jobs
 
 
 def fetch_business_areas():
