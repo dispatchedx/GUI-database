@@ -8,7 +8,7 @@ class RecruiterWindow(mysqlFunctions.Common):
     def __init__(self, master, stored_username):
         # Tables: etaireia (link=AFM) recruiter
         # TODO change liagourma to stored_username
-        self.stored_username = 'msmith'#stored_username
+        self.stored_username = stored_username
         mysqlFunctions.Common.__init__(self)
         self.master = master
         master.title('Recruiter control panel')
@@ -236,6 +236,7 @@ class RecruiterWindow(mysqlFunctions.Common):
             messagebox.showerror('Error', 'You can only edit your own jobs')
             return -1
         else:
+            # TODO
             self.start_date = Label(self.master, 'Start date')
             self.salary = Label(self.master, 'Salary')
             self.position = Label(self.master, 'Position')
@@ -252,6 +253,7 @@ class RecruiterWindow(mysqlFunctions.Common):
 
 
 if __name__ == '__main__':
+    # This is to help debugging without the need to log in each time
     root = Tk()
-    app = RecruiterWindow(root, None)
+    app = RecruiterWindow(root, 'msmith')
     root.mainloop()

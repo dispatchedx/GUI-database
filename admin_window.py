@@ -6,7 +6,6 @@ from tkinter import ttk
 
 
 class AdminWindow(mysqlFunctions.Common):
-    # TODO make a new window or configure the current one?
     def __init__(self, master):
         mysqlFunctions.Common.__init__(self)
         self.master = master
@@ -81,20 +80,8 @@ class AdminWindow(mysqlFunctions.Common):
                                   description_entry]
 
     def add_business_areas(self):
-        # TODO delete the commented out stuff
         self.destroyer()
 
-        '''def submit():
-            info_list = [input_title.get(),
-                         input_description.get(),
-                         belongs_to_combobox.selection_get()]
-
-            result = mysqlFunctions.register(info_list, 'business_areas')
-            if result == 'Success':
-                self.destroyer()
-                messagebox.showinfo("Success", f'Registration of {info_list[0]} was a success')
-            else:
-                messagebox.showerror("Error", result)'''
         # Variables
         input_title = StringVar()
         input_description = StringVar()
@@ -140,7 +127,7 @@ class AdminWindow(mysqlFunctions.Common):
                                   ]
 
     def changes_history(self):
-        # TODO implement this but need mysql part
+        # TODO implement this
         self.destroyer()
         self.change_h_for_table = Label(self.master, text='Show history for table')
         self.change_h_for_table.grid(row=2, column=5)
@@ -185,6 +172,7 @@ class AdminWindow(mysqlFunctions.Common):
 
 
 if __name__ == '__main__':
+    # This is to help debugging without the need to log in each time
     root = Tk()
     app = AdminWindow(root)
     root.mainloop()

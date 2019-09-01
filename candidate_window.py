@@ -6,8 +6,7 @@ from tkinter import ttk
 
 class CandidateWindow(mysqlFunctions.Common):
     def __init__(self, master, stored_username):
-        #TODO change liagourma to stored_username
-        self.stored_username = 'liagourma'#stored_username
+        self.stored_username = stored_username
         mysqlFunctions.Common.__init__(self)
         self.master = master
         master.title('Candidate control panel')
@@ -126,15 +125,8 @@ class CandidateWindow(mysqlFunctions.Common):
         self.removable_widgets.extend([self.treeview, delete_application_button])
 
 
-# TODO check this
-
-
-'''
-def finish(self):
-    self.master.destroy()
-'''
-
 if __name__ == '__main__':
+    # This is to help debugging without the need to log in each time
     root = Tk()
-    app = CandidateWindow(root, None)
+    app = CandidateWindow(root, 'liagourma')
     root.mainloop()

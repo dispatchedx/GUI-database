@@ -4,6 +4,7 @@ from tkinter import messagebox
 
 host = '127.128.0.1'
 port = 3306
+# user and password can be changed at ln 332
 user = 'root'
 password = 'root'
 database = 'erecruit'
@@ -39,9 +40,6 @@ class Common(object):
             pass
 
     def register_base(self):
-        # TODO registration date no need for this it should be automatic
-        # TODO username=12 length, password=10, name=25, surname=35, email=30, firm/AFM=9, exp_years=TINYINT,
-        # TODO sistatikes=35, certificates=35
         # Input variables
         self.input_username = StringVar()
         self.input_password = StringVar()
@@ -80,7 +78,6 @@ class Common(object):
 
         self.removable_widgets = [self.username, self.username_entry, self.password, self.password_entry, self.name,
                                   self.name_entry, self.surname, self.surname_entry, self.email, self.email_entry]
-
 
     def register_recruiter(self):
         self.destroyer()
@@ -326,13 +323,14 @@ def login(username, password):
     :return: Α String containing the type_of_user of user. Can be either "candidate", "recruiter", "admin".
      If user doesnt exist returns "None"
     """
-    # TODO is this how it should even work ? replace root with username, password
-
+    # TODO
+    # Mysql encrypts the password and causes errors. will need to specify not to encypt for each user
+    # Current implementation logs into the database as root for above reason but will record changes as root
     my_database = MySQLdb.connect(
         host=host,
         port=port,
-        user='root',
-        passwd='root',
+        user='root',    # replace 'root' with username to log into the database as a user
+        passwd='root',  # replace 'root' with password to log into the database as a user
         db=str(database)
     )
     cursor = my_database.cursor()
@@ -352,6 +350,7 @@ def login(username, password):
             return None
     finally:
         cursor.close()
+
 
 def apply_to_jobs(candidate_username, job_name):
     cursor = my_database.cursor()
